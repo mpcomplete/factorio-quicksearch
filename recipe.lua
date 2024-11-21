@@ -6,7 +6,7 @@ local Recipe = {}
 function Recipe.findMatches(player, matchFunc, showHidden)
   local matches = {}
   for name, recipe in pairs(player.force.recipes) do
-    local itemProto = recipe.prototype.main_product and game.item_prototypes[recipe.prototype.main_product.name]
+    local itemProto = recipe.prototype.main_product and prototypes.item[recipe.prototype.main_product.name]
     local visible = (not recipe.hidden and recipe.enabled) or showHidden
     local canPlaceOrCraft = itemProto and itemProto.stackable
     if itemProto and not matches[itemProto.name] and visible and canPlaceOrCraft then
@@ -39,7 +39,7 @@ end
 
 -- Player chose a recipe.
 function Recipe.pick(player, match, event)
-  local itemProto = game.item_prototypes[match.recipe.prototype.main_product.name]
+  local itemProto = prototypes.item[match.recipe.prototype.main_product.name]
   local craft =
     (event.shift) and 100 or -- "100" means "a full stack"
     (event.control and event.button == defines.mouse_button_type.right) and 5 or

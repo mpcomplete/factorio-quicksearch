@@ -16,7 +16,7 @@ function Logistic.findMatches(player, matchFunc)
         for name, count in pairs(contents) do
           local matchDist = matchFunc(player, name)
           if matchDist then
-            local itemProto = game.item_prototypes[name]
+            local itemProto = prototypes.item[name]
             matches[name] = {
               name = name,
               itemProto = itemProto,
@@ -45,7 +45,7 @@ end
 
 -- Player chose an item from a logistic network.
 function Logistic.pick(player, match, event)
-  local itemProto = game.item_prototypes[match.name]
+  local itemProto = prototypes.item[match.name]
   local request =
     (event.shift) and itemProto.stack_size or
     (event.control and event.button == defines.mouse_button_type.right) and 5 or
