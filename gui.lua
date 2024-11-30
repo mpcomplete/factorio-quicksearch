@@ -188,7 +188,9 @@ function Gui.acceptMatch(player, index, event)
   if match then
     if event.control and event.alt then
       local action_type = (event.button == defines.mouse_button_type.left) and "craft" or "usage"
-      remote.call("fnei", "show_recipe_for_prot", action_type, match.itemProto.type, match.itemProto.name)
+      if not pcall(function() remote.call("fnei", "show_recipe_for_prot", action_type, match.itemProto.type, match.itemProto.name) end) then
+        player.print("Cannot open FNEI")
+      end
     elseif event.alt then
       Global.get(player).favorites = Global.get(player).favorites or {}
       Global.get(player).favorites[match.name] = not Global.get(player).favorites[match.name]

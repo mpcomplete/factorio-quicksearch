@@ -13,7 +13,9 @@ function Logistic.findMatches(player, matchFunc)
         -- skip player-owned roboports
       else
         local contents = network.get_contents()
-        for name, count in pairs(contents) do
+        for cindex, entry in ipairs(contents) do
+          local name = entry.name
+          local count = entry.count
           local matchDist = matchFunc(player, name)
           if matchDist then
             local itemProto = prototypes.item[name]
