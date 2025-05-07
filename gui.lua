@@ -9,64 +9,90 @@ local Logistic = require("logistic")
 
 local Gui = {}
 
-function Gui.open(player)
-  if not player.gui.left.quicksearch then
-    Global.get(player).gui = {}
-    Gui.setQuery(player, "")
-    window = player.gui.left.add{
-      type = "frame",
-      name = "quicksearch",
-      direction = "vertical",
-      style = "quicksearch-window-style",
-      vertical_scroll_policy = "never",
-    }
-    -- Row 1: input area
-    do
-      frame = window.add{
-        type = "flow",
-        name = "inputarea",
-      }
-      frame.add{
-        type = "textfield",
-        name = "quicksearch.query"
-      }
-      frame.add{
-        type = "button",
-        name = "quicksearch.close",
-        caption = " X ",
-        style = "quicksearch-button-style"
-      }
-    end
-    -- Row 2: checkbox
-    window.add{
-      type = "checkbox",
-      name = "quicksearch.toggle-hidden",
-      caption = "Show hidden/unresearched recipes",
-      style = "quicksearch-checkbox-style",
-      state = Global.get(player).showHidden or false
-    }
-    -- Row 3: matches
-    window.add{
-      type = "flow",
-      name = "matches",
-      direction = "horizontal",
-      style = "quicksearch-match-horizontal-flow-style",
-    }
-  end
-  Gui.refresh(player)
-
-  player.gui.left.quicksearch.inputarea["quicksearch.query"].focus()
+function GUI(player)
+  return player.gui.screen.quicksearch
 end
 
-function Gui.close(player)
-  if player.gui.left.quicksearch then
-    player.gui.left.quicksearch.destroy()
-  end
+function destroyGui(player)
+  if GUI(player) ~= nil then GUI(player).destroy() end
   Global.get(player).gui = {}
 end
 
+function showGui(player)
+  if Global.get(player).guiVersion ~= 1 then destroyGui(player) end
+  Global.get(player).guiVersion = 1
+  if GUI(player) == nil then buildGui(player) end
+  GUI(player).visible = true
+  GUI(player).inputarea["quicksearch.query"].text = ""
+  GUI(player).inputarea["quicksearch.query"].focus()
+  Global.get(player).gui = {}
+  Gui.setQuery(player, "")
+  Gui.refresh(player)
+end
+
+function hideGui(player)
+  if GUI(player) ~= nil then GUI(player).visible = false end
+end
+
+function buildGui(player)
+  if GUI(player) ~= nil then return end
+
+  window = player.gui.screen.add{
+    type = "frame",
+    name = "quicksearch",
+    direction = "vertical",
+    style = "quicksearch-window-style",
+    caption = "Quicksearch",
+    vertical_scroll_policy = "never",
+  }
+  -- Row 1: input area
+  do
+    frame = window.add{
+      type = "flow",
+      name = "inputarea",
+    }
+    frame.add{
+      type = "textfield",
+      name = "quicksearch.query"
+    }
+    frame.add{
+      type = "button",
+      name = "quicksearch.close",
+      caption = " X ",
+      style = "quicksearch-button-style"
+    }
+  end
+  -- Row 2: checkbox
+  window.add{
+    type = "checkbox",
+    name = "quicksearch.toggle-hidden",
+    caption = "Show hidden/unresearched recipes",
+    style = "quicksearch-checkbox-style",
+    state = Global.get(player).showHidden or false
+  }
+  -- Row 3: matches
+  window.add{
+    type = "flow",
+    name = "matches",
+    direction = "horizontal",
+    style = "quicksearch-match-horizontal-flow-style",
+  }
+end
+
+function Gui.open(player)
+  showGui(player)
+end
+
+function Gui.close(player)
+  hideGui(player)
+end
+
+function Gui.isOpen(player)
+  return GUI(player) ~= nil and GUI(player).visible
+end
+
 function Gui.get(player)
-  return player.gui.left.quicksearch
+  return GUI(player)
 end
 
 function Gui.global(player)
@@ -96,11 +122,11 @@ function Gui.toggleHidden(player)
 end
 
 function Gui.refresh(player)
-  if not player.gui.left.quicksearch then return end
+  if not player.gui.screen.quicksearch then return end
   debug(player, "Refreshing GUI.")
 
-  local matchesFrame = player.gui.left.quicksearch.matches
-  Gui.global(player).matches = {}
+  local matchesFrame = player.gui.screen.quicksearch.matches
+  Gui.matches = {}
 
   -- Add matching items from player's inventory.
   local matches = Inventory.findMatches(player, {player.get_main_inventory()}, Gui.matchQuery)
@@ -173,18 +199,18 @@ function Gui.buildMatchGrid(player, parent, caption, name, matches)
   for name, match in Lib.spairs(matches, function(t, a, b) return t[a].order < t[b].order end) do
     g = grid.add{
       type = "sprite-button",
-      name = string.format("quicksearch.match/%d", #Gui.global(player).matches + 1),
+      name = string.format("quicksearch.match/%d", #Gui.matches + 1),
       tooltip = match.tooltip,
       number = match.number,
       sprite = match.sprite,
       style = isFavorite(player, match.name) and "quicksearch-match-item-favorite-style" or "quicksearch-match-item-style",
     }
-    table.insert(Gui.global(player).matches, match)
+    table.insert(Gui.matches, match)
   end
 end
 
 function Gui.acceptMatch(player, index, event)
-  local match = Gui.global(player).matches[index]
+  local match = Gui.matches[index]
   if match then
     if event.control and event.alt then
       local action_type = (event.button == defines.mouse_button_type.left) and "craft" or "usage"

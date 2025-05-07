@@ -17,7 +17,7 @@ script.on_init(onInit)
 
 script.on_event("quicksearch-open", function(event)
   local player = game.players[event.player_index]
-  if Gui.get(player) then
+  if Gui.isOpen(player) then
     Gui.close(player)
   else
     Gui.open(player)

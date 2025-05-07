@@ -1,15 +1,15 @@
 local Global = {}
 
 function Global.get(player)
-  global = global or {}
-  global.perplayer = global.perplayer or {}
-  global.perplayer[player.index] = global.perplayer[player.index] or {}
-  return global.perplayer[player.index]
+  -- storage = storage or {}
+  storage.perplayer = storage.perplayer or {}
+  storage.perplayer[player.index] = storage.perplayer[player.index] or {}
+  return storage.perplayer[player.index]
 end
 
 function Global.destroy(player_index)
-  if global and global.perplayer then
-    global.perplayer[player_index] = nil
+  if storage and storage.perplayer then
+    storage.perplayer[player_index] = nil
   end
 end
 
