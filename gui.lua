@@ -19,8 +19,8 @@ function destroyGui(player)
 end
 
 function showGui(player)
-  if Global.get(player).guiVersion ~= 1 then destroyGui(player) end
-  Global.get(player).guiVersion = 1
+  if Global.get(player).guiVersion ~= 2 then destroyGui(player) end
+  Global.get(player).guiVersion = 2
   if GUI(player) == nil then buildGui(player) end
   GUI(player).visible = true
   GUI(player).inputarea["quicksearch.query"].text = ""
@@ -137,8 +137,8 @@ function Gui.refresh(player)
     style = "quicksearch-match-vertical-flow-style",
   }
   leftFlow.style.vertically_stretchable = true
-  Gui.buildMatchGrid(player, leftFlow, "Inventory", "inventory", matches)
-  
+  Gui.buildMatchGrid(player, leftFlow, "Inventory", "inventoryGrid", matches)
+
   -- Add matching recipes.
   local matches = Recipe.findMatches(player, Gui.matchQuery, Global.get(player).showHidden)
   Gui.buildMatchGrid(player, leftFlow, "Crafting", "crafting", matches)
@@ -236,5 +236,5 @@ end
 function isFavorite(player, name)
   return Global.get(player).favorites and Global.get(player).favorites[name]
 end
-  
+
 return Gui
