@@ -2,6 +2,8 @@
 Version: 1.1.5
 Date: 2026 jul 08
   - Updated for Factorio 2.1
+  - Now uses builtin ghost cursor for items/entities not in inventory
+  - Added toggles for displaying matches from different categories (inventory, recipes, logistics)
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.4
 Date: 2025 mar 27
