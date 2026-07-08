@@ -9,53 +9,37 @@ function getBoxDims(box)
   return width, height
 end
 
--- Creates a temporary blueprint for the given entity prototype.
+-- Creates a ghost tool for the given entity prototype directly in the player's cursor.
+-- Uses Factorio 2.0's built-in ghost-in-cursor feature, so no temporary blueprint is needed.
 function Fact.createGhostTool(player, entityProto)
-  local bp = player.cursor_stack.set_stack("blueprint") and player.cursor_stack
-  if not bp then return end
- 
-  bp.clear_blueprint()
-  bp.label = "Quicksearch Ghost"
-  bp.allow_manual_label_change = false
-
-  -- Center the entity on the cursor.
-  local w, h
-  if entityProto.selection_box then w, h = getBoxDims(entityProto.selection_box) end
-  local x = w and w % 2 == 0 and -0.5 or 0
-  local y = h and h % 2 == 0 and -0.5 or 0
-  x = x + (entityProto.building_grid_bit_shift or 0)
-  y = y - (entityProto.building_grid_bit_shift or 0)
-
-  local b=entityProto.selection_box
-  debug(player, "ghost: box=[%f,%f;%f,%f] w,h=%f,%f shift=%f x,y=%f,%f", b.left_top.x, b.left_top.y, b.right_bottom.x, b.right_bottom.y, w, h, entityProto.building_grid_bit_shift, x, y)
+  if not entityProto then return nil end
 
   local ok = pcall(function()
-    bp.set_blueprint_entities{
-      {
-        entity_number = 1,
-        name = entityProto.name,
-        direction = defines.direction.north,
-        position = {x, y},
-      }
-    }
+    -- Sets the entity ghost in the cursor; Factorio places it as a buildable ghost.
+    player.cursor_ghost = entityProto.name
+    -- Make the ghost a temporary cursor item so it is not stored in the inventory
+    -- and returns to the previous cursor contents when cleared, matching the old
+    -- temporary-blueprint behavior.
+    -- player.cursor_stack_temporary = true
   end)
   if not ok then
-    -- Can sometimes fail even if itemProto.place_result is valid for some reason. Ex: cargo wagon.
-    player.cursor_stack.clear()
+    -- Can sometimes fail even if entityProto is valid for some reason. Ex: cargo wagon.
+    player.print("cursor_ghost failed for " .. entityProto.name)
+    player.clear_cursor()
     return nil
   end
-  return bp
+  return player.cursor_stack
 end
 
 -- Destroys all instances of the above-mentioned ghost tool blueprint from the player's inventory.
 function Fact.destroyGhostTool(player)
-  local inv = player.get_main_inventory()
-  for i = 1,#inv do
-    if inv[i].valid_for_read and inv[i].type == "blueprint" and inv[i].label == "Quicksearch Ghost" then
-      debug(player, "Zapping ghost")
-      inv[i].clear()
-    end
-  end
+  -- local inv = player.get_main_inventory()
+  -- for i = 1,#inv do
+  --   if inv[i].valid_for_read and inv[i].type == "blueprint" and inv[i].label == "Quicksearch Ghost" then
+  --     debug(player, "Zapping ghost")
+  --     inv[i].clear()
+  --   end
+  -- end
 end
 
 return Fact
