@@ -8,6 +8,7 @@ local Recipe = require("recipe")
 local Logistic = require("logistic")
 
 local Gui = {}
+Gui.toggleFuncs = {}
 
 function GUI(player)
   return player.gui.screen.quicksearch
@@ -62,14 +63,45 @@ function buildGui(player)
       style = "quicksearch-button-style"
     }
   end
-  -- Row 2: checkbox
-  window.add{
-    type = "checkbox",
-    name = "quicksearch.toggle-hidden",
-    caption = "Show hidden/unresearched recipes",
-    style = "quicksearch-checkbox-style",
-    state = Global.get(player).showHidden or false
-  }
+
+  -- Row 2: checkboxes
+  do
+    local frame = window.add{
+      type = "flow",
+      name = "displayOptions",
+      direction = "horizontal",
+      style = "quicksearch-options-flow-style",
+    }
+    frame.add{
+      type = "checkbox",
+      name = "quicksearch.toggle-hidden",
+      caption = "Show hidden/unresearched recipes",
+      style = "quicksearch-checkbox-style",
+      state = Global.get(player).showHidden or false
+    }
+    frame.add{
+      type = "checkbox",
+      name = "quicksearch.toggle-inventory",
+      caption = "Inventories",
+      style = "quicksearch-checkbox-style",
+      state = not Global.get(player).hideInventory
+    }
+    frame.add{
+      type = "checkbox",
+      name = "quicksearch.toggle-recipe",
+      caption = "Recipes",
+      style = "quicksearch-checkbox-style",
+      state = not Global.get(player).hideRecipes
+    }
+    frame.add{
+      type = "checkbox",
+      name = "quicksearch.toggle-logistics",
+      caption = "Logistics",
+      style = "quicksearch-checkbox-style",
+      state = not Global.get(player).hideLogistics
+    }
+  end
+
   -- Row 3: matches
   window.add{
     type = "flow",
@@ -78,6 +110,24 @@ function buildGui(player)
     style = "quicksearch-match-horizontal-flow-style",
   }
 end
+
+Gui.toggleFuncs["quicksearch.toggle-hidden"] = function(player)
+  Global.get(player).showHidden = not Global.get(player).showHidden
+  Gui.refresh(player)
+end
+Gui.toggleFuncs["quicksearch.toggle-inventory"] = function(player)
+  Global.get(player).hideInventory = not Global.get(player).hideInventory
+  Gui.refresh(player)
+end
+Gui.toggleFuncs["quicksearch.toggle-recipe"] = function(player)
+  Global.get(player).hideRecipes = not Global.get(player).hideRecipes
+  Gui.refresh(player)
+end
+Gui.toggleFuncs["quicksearch.toggle-logistics"] = function(player)
+  Global.get(player).hideLogistics = not Global.get(player).hideLogistics
+  Gui.refresh(player)
+end
+
 
 function Gui.open(player)
   showGui(player)
@@ -116,11 +166,6 @@ function Gui.matchQuery(player, text)
   return false
 end
 
-function Gui.toggleHidden(player)
-  Global.get(player).showHidden = not Global.get(player).showHidden
-  Gui.refresh(player)
-end
-
 function Gui.refresh(player)
   if not player.gui.screen.quicksearch then return end
   debug(player, "Refreshing GUI.")
@@ -128,8 +173,6 @@ function Gui.refresh(player)
   local matchesFrame = player.gui.screen.quicksearch.matches
   Gui.matches = {}
 
-  -- Add matching items from player's inventory.
-  local matches = Inventory.findMatches(player, {player.get_main_inventory()}, Gui.matchQuery)
   local leftFlow = matchesFrame.left or matchesFrame.add{
     type = "flow",
     name = "left",
@@ -137,10 +180,15 @@ function Gui.refresh(player)
     style = "quicksearch-match-vertical-flow-style",
   }
   leftFlow.style.vertically_stretchable = true
+
+  -- Add matching items from player's inventory.
+  local matches = Inventory.findMatches(player, {player.get_main_inventory()}, Gui.matchQuery)
+  if Global.get(player).hideInventory then matches = {} end
   Gui.buildMatchGrid(player, leftFlow, "Inventory", "inventoryGrid", matches)
 
   -- Add matching recipes.
   local matches = Recipe.findMatches(player, Gui.matchQuery, Global.get(player).showHidden)
+  if Global.get(player).hideRecipes then matches = {} end
   Gui.buildMatchGrid(player, leftFlow, "Crafting", "crafting", matches)
 
   local rightFlow = matchesFrame.right or matchesFrame.add{
@@ -154,10 +202,12 @@ function Gui.refresh(player)
   -- Add matches from current chest.
   local matches = Inventory.findMatches(player, {Inventory.getForOpenContainer(player)}, Gui.matchQuery)
   local caption = next(matches) and player.opened.localised_name or ""
+  if Global.get(player).hideInventory then matches = {} end
   Gui.buildMatchGrid(player, rightFlow, caption, "container", matches)
 
   -- Add matches from logistics networks.
   local matches = Logistic.findMatches(player, Gui.matchQuery)
+  if Global.get(player).hideLogistics then matches = {} end
   Gui.buildMatchGrid(player, rightFlow, "Logistics Networks", "logistic", matches)
 end
 

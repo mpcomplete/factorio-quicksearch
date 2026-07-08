@@ -43,6 +43,17 @@ data.raw["gui-style"].default["quicksearch-button-style"] =
 	clicked_font_color = {r = 1, g = 0.707, b = 0.12}
 }
 
+data.raw["gui-style"].default["quicksearch-options-flow-style"] =
+{
+  type = "horizontal_flow_style",
+  padding = 2,
+  horizontal_spacing = 4,
+  vertical_spacing = 0,
+  resize_row_to_width = false,
+  resize_to_row_height = true,
+  scalable = false,
+}
+
 data.raw["gui-style"].default["quicksearch-checkbox-style"] =
 {
 	type = "checkbox_style",
