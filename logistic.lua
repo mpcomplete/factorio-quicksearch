@@ -55,10 +55,7 @@ function Logistic.pick(player, match, event)
     0
 
   if request == 0 then
-    -- Grab ghost of the item.
-    if itemProto.place_result then
-      Fact.createGhostTool(player, itemProto.place_result)
-    end
+    Fact.createGhostTool(player, itemProto)
     return
   end
 

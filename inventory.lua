@@ -17,9 +17,9 @@ function Inventory.getForOpenContainer(player)
 end
 
 -- Finds a slot in the given inventory that is capable of holding more of the given item (either empty or a partial stack)
-function Inventory.findAvailableSlot(inv, itemName)
+function Inventory.findAvailableSlot(inv, nameAndQuality)
   for i=1,#inv do
-    if inv[i].valid and inv[i].valid_for_read and inv[i].name == itemName and inv[i].count < inv[i].prototype.stack_size then
+    if inv[i].valid and inv[i].valid_for_read and inv[i].name == nameAndQuality.name and inv[i].quality == nameAndQuality.quality and inv[i].count < inv[i].prototype.stack_size then
       return inv[i]
     end
     if inv[i].valid and not inv[i].valid_for_read then
@@ -30,9 +30,9 @@ end
 
 -- Transfers the given amount of the specified item between inventories.
 function Inventory.transferItems(fromInventory, toInventory, item, amount)
-  local itemName = item.name
+  local nameAndQuality = {name = item.name, quality = item.quality}
   while amount > 0 and item and item.valid and item.valid_for_read do
-    local targetSlot = Inventory.findAvailableSlot(toInventory, itemName)
+    local targetSlot = Inventory.findAvailableSlot(toInventory, nameAndQuality)
     if not targetSlot then break end
     if targetSlot.valid_for_read then
       -- Add to existing slot.
@@ -51,7 +51,7 @@ function Inventory.transferItems(fromInventory, toInventory, item, amount)
       amount = amount - item.count
       targetSlot.swap_stack(item)
     end
-    item = fromInventory.find_item_stack(itemName)
+    item = fromInventory.find_item_stack(nameAndQuality)
   end
 end
 
@@ -63,12 +63,16 @@ function Inventory.findMatches(player, inventories, matchFunc)
     for i = 1,#inv do
       local item = inv[i]
       if item.valid_for_read then
-        local matchName = item.is_item_with_label and item.label or item.name
+        local nameOrLabel = item.is_item_with_label and item.label or item.name
+        local matchName = nameOrLabel .. '-' .. item.quality.name
         local matchDist = matchFunc(player, matchName)
         if matchDist then
           matches[matchName] = {
             inventory = inv,
             name = matchName,
+            quality = item.quality,
+            nameAndQuality = {name = nameOrLabel, quality = item.quality},
+            nameOrLabel = nameOrLabel,
             itemProto = item.prototype,
             isLabel = item.is_item_with_label and item.label,
             number = (matches[matchName] or empty).number + item.count,
@@ -95,10 +99,10 @@ end
 
 -- Helper to find the item corresponding to the given match.
 function Inventory.findItem(player, match)
-  if not match.isLabel then return match.inventory.find_item_stack(match.name) end
+  if not match.isLabel then return match.inventory.find_item_stack(match.nameAndQuality) end
   for i = 1,#match.inventory do
     local item = match.inventory[i]
-    if match.name == item.label then return item end
+    if match.nameOrLabel == item.label then return item end
   end
 end
 

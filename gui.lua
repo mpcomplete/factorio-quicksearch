@@ -203,6 +203,7 @@ function Gui.buildMatchGrid(player, parent, caption, name, matches)
       tooltip = match.tooltip,
       number = match.number,
       sprite = match.sprite,
+      quality = match.quality and match.quality.name or nil,
       style = isFavorite(player, match.name) and "quicksearch-match-item-favorite-style" or "quicksearch-match-item-style",
     }
     table.insert(Gui.matches, match)

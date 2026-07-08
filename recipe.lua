@@ -46,10 +46,7 @@ function Recipe.pick(player, match, event)
     (event.control) and 1 or
     0
   if craft == 0 then
-    -- Grab ghost of the item.
-    -- if itemProto.place_result then
-      Fact.createGhostTool(player, itemProto.place_result)
-    -- end
+    Fact.createGhostTool(player, itemProto)
     return
   end
   -- Craft the item.
