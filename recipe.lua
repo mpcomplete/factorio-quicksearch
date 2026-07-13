@@ -26,8 +26,8 @@ function Recipe.findMatches(player, matchFunc, showHidden)
             "\nclick = pick up ghost of item",
             "\nctrl+click = craft single item",
             "\nshift+click = craft stack of item",
-            "\nalt+click = toggle favorite",
-            "\nctrl+alt+click = open in FNEI",
+            "\nalt+click = open in factoriopedia",
+            "\nctrl+alt+click = toggle favorite",
           },
           acceptFunc = Recipe.pick,
         }

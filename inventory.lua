@@ -69,14 +69,14 @@ function Inventory.findMatches(player, inventories, matchFunc)
         if matchDist then
           matches[matchName] = {
             inventory = inv,
-            name = matchName,
+            name = nameOrLabel,
             quality = item.quality,
             nameAndQuality = {name = nameOrLabel, quality = item.quality},
             nameOrLabel = nameOrLabel,
             itemProto = item.prototype,
             isLabel = item.is_item_with_label and item.label,
             number = (matches[matchName] or empty).number + item.count,
-            order = (isFavorite(player, matchName) and "[a]" or "[b]") .. string.format("%04d", matchDist) .. item.prototype.order,
+            order = (isFavorite(player, nameOrLabel) and "[a]" or "[b]") .. string.format("%04d", matchDist) .. item.prototype.order,
             sprite = "item/"..item.name,
             tooltip = {
               "",
@@ -85,8 +85,8 @@ function Inventory.findMatches(player, inventories, matchFunc)
               "\nclick = pick up item",
               "\nshift+click = transfer single stack to other inventory",
               "\nctrl+click = transfer all stacks to other inventory",
-              "\nalt+click = toggle favorite",
-              "\nctrl+alt+click = open in FNEI",
+              "\nalt+click = open in factoriopedia",
+              "\nctrl+alt+click = toggle favorite",
             },
             acceptFunc = Inventory.pick,
           }
@@ -102,7 +102,7 @@ function Inventory.findItem(player, match)
   if not match.isLabel then return match.inventory.find_item_stack(match.nameAndQuality) end
   for i = 1,#match.inventory do
     local item = match.inventory[i]
-    if match.nameOrLabel == item.label then return item end
+    if match.name == item.label then return item end
   end
 end
 

@@ -32,8 +32,8 @@ function Logistic.findMatches(player, matchFunc)
                 "\nclick = pick up ghost of item",
                 "\nctrl+click = add 1 of this item to logistic requests",
                 "\nshift+click = add a full stack of this item to logistic requests",
-                "\nalt+click = toggle favorite",
-                "\nctrl+alt+click = open in FNEI",
+                "\nalt+click = open in factoriopedia",
+                "\nctrl+alt+click = toggle favorite",
               },
               acceptFunc = Logistic.pick,
             }

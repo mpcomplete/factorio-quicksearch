@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.6
+Date: 2026 jul 12
+  - alt+click now opens the item in Factoriopedia (was previously ctrl+alt+click for FNEI)
+  - ctrl+alt+click now favorites the item (was alt+click)
+---------------------------------------------------------------------------------------------------
 Version: 1.1.5
 Date: 2026 jul 08
   - Updated for Factorio 2.1

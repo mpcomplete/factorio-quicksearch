@@ -264,14 +264,11 @@ function Gui.acceptMatch(player, index, event)
   local match = Gui.matches[index]
   if match then
     if event.control and event.alt then
-      local action_type = (event.button == defines.mouse_button_type.left) and "craft" or "usage"
-      if not pcall(function() remote.call("fnei", "show_recipe_for_prot", action_type, match.itemProto.type, match.itemProto.name) end) then
-        player.print("Cannot open FNEI")
-      end
-    elseif event.alt then
       Global.get(player).favorites = Global.get(player).favorites or {}
       Global.get(player).favorites[match.name] = not Global.get(player).favorites[match.name]
       debug(player, "Favorite match=%s: %s", match.name, isFavorite(player, match.name) and "yes" or "no")
+    elseif event.alt then
+      player.open_factoriopedia_gui(match.itemProto)
     else
       debug(player, "Accepting match=%s", match.name)
       local ok = pcall(function()
