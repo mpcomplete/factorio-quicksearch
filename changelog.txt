@@ -1,4 +1,8 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.7
+Date: 2026 jul 15
+  - Lower version requirement back to Factorio 2.0. Previous changes do not need latest version.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.6
 Date: 2026 jul 12
   - alt+click now opens the item in Factoriopedia (was previously ctrl+alt+click for FNEI)
